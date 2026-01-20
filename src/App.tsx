@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { RequireAuth } from './components/auth/RequireAuth';
 import { AppLayout } from './components/layout/AppLayout';
 import { Login } from './pages/Auth/Login';
 import { Dashboard } from './pages/Dashboard';
@@ -13,7 +14,11 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
 
-          <Route path="/" element={<AppLayout />}>
+          <Route path="/" element={
+            <RequireAuth>
+              <AppLayout />
+            </RequireAuth>
+          }>
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<PropertyList />} />
             <Route path="properties/:id" element={<PropertyDetail />} />

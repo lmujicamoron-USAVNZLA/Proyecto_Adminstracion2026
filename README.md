@@ -1,4 +1,4 @@
-# Nexus Real Estate CRM
+# Proyecto Administración 2026 (Nexus CRM)
 
 A modern, premium Real Estate Relationship Management system built with React, Vite, and Supabase.
 
@@ -47,20 +47,3 @@ To connect to a real database:
 1. Create a project on [Supabase](https://supabase.com).
 2. Create `profiles`, `properties`, `transactions` tables.
 3. Add `.env` file with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-
-## 📝 GitHub Setup (How to upload)
-
-Since Git was not detected, follow these steps to upload:
-
-1. Install [Git](https://git-scm.com/downloads).
-2. Open terminal in this folder.
-3. Run:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   # Add your remote repository URL
-   git remote add origin <YOUR_GITHUB_REPO_URL>
-   git push -u origin main
-   ```

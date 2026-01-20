@@ -1,6 +1,7 @@
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Users, DollarSign, Settings, LogOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useAuth } from '../../context/AuthContext';
 
 const SidebarItem = ({ icon: Icon, label, to }: { icon: any, label: string, to: string }) => {
     return (
@@ -24,6 +25,14 @@ const SidebarItem = ({ icon: Icon, label, to }: { icon: any, label: string, to: 
 };
 
 export const AppLayout = () => {
+    const { signOut } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSignOut = async () => {
+        await signOut();
+        navigate('/login');
+    };
+
     return (
         <div className="flex h-screen bg-background overflow-hidden text-foreground selection:bg-primary/30">
             {/* Glassmorphism Sidebar */}
@@ -47,7 +56,10 @@ export const AppLayout = () => {
                 </nav>
 
                 <div className="p-4 mt-auto">
-                    <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-400 hover:bg-red-500/10 transition-colors">
+                    <button
+                        onClick={handleSignOut}
+                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
                         <LogOut size={20} />
                         <span>Cerrar Sesión</span>
                     </button>

@@ -38,6 +38,8 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhyYWpkbmlxcXZ4bGhqbWxuZ3h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDMwMDIsImV4cCI6MjA4NTExOTAwMn0.dYODdtdDan-zDRHUoHExK0cE7j0f75eLMo9nx1nwvrE' }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          enablement: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

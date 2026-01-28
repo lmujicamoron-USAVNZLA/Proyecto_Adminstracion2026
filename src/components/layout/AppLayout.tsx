@@ -1,9 +1,11 @@
+import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Users, DollarSign, Settings, LogOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
+import { NotificationCenter } from '../notifications/NotificationCenter';
 
-const SidebarItem = ({ icon: Icon, label, to }: { icon: any, label: string, to: string }) => {
+const SidebarItem = ({ icon: Icon, label, to }: { icon: React.ElementType, label: string, to: string }) => {
     return (
         <NavLink
             to={to}
@@ -16,22 +18,30 @@ const SidebarItem = ({ icon: Icon, label, to }: { icon: any, label: string, to: 
                 )
             }
         >
-            <Icon size={20} className="relative z-10" />
-            <span className="relative z-10">{label}</span>
-            {/* Active Indicator Glow */}
-            <NavLink to={to} className={({ isActive }) => isActive ? "absolute left-0 top-0 h-full w-1 bg-primary blur-[2px]" : "hidden"} />
+            {({ isActive }) => (
+                <>
+                    <Icon size={20} className="relative z-10" />
+                    <span className="relative z-10">{label}</span>
+                    {isActive && (
+                        <div className="absolute left-0 top-0 h-full w-1 bg-primary blur-[2px]" />
+                    )}
+                </>
+            )}
         </NavLink>
     );
 };
 
 export const AppLayout = () => {
-    const { signOut } = useAuth();
+    const { signOut, user } = useAuth();
     const navigate = useNavigate();
 
     const handleSignOut = async () => {
         await signOut();
         navigate('/login');
     };
+
+    const fullName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuario';
+    const initials = fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
     return (
         <div className="flex h-screen bg-background overflow-hidden text-foreground selection:bg-primary/30">
@@ -74,16 +84,18 @@ export const AppLayout = () => {
 
                 {/* Header */}
                 <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 backdrop-blur-sm relative z-10">
-                    <h2 className="text-lg font-medium text-muted-foreground">Bienvenido, <span className="text-foreground">Administrador</span></h2>
+                    <h2 className="text-lg font-medium text-muted-foreground">Bienvenido, <span className="text-foreground">{fullName}</span></h2>
                     <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-white/10 flex items-center justify-center">
-                            <span className="font-bold text-sm">JS</span>
+                        <NotificationCenter />
+                        <div className="h-px w-4 bg-white/10" />
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 border border-white/10 flex items-center justify-center">
+                            <span className="font-bold text-sm text-white">{initials}</span>
                         </div>
                     </div>
                 </header>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-auto p-8 relative z-10">
+                <div className="flex-1 overflow-auto p-8 relative z-10 flex flex-col">
                     <Outlet />
                 </div>
             </main>

@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Building2, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 export const Login = () => {
     const navigate = useNavigate();
+    const { enterDemoMode } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -24,16 +26,15 @@ export const Login = () => {
 
             if (error) throw error;
             navigate('/');
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             // For demo purposes, if Supabase is not connected (error includes "placeholder"), allow login as demo
-            if (err.message && (err.message.includes('placeholder') || err.message.includes('fetch'))) {
+            if (error.message && (error.message.includes('placeholder') || error.message.includes('fetch'))) {
                 // Hack for demo if no backend
                 console.warn("Supabase not connected. Allowing Demo Login.");
-                // Manually setting a fake session in local storage or handling via state would be complex without modifying AuthProvider to support mock.
-                // So we will just show the error, but adding a Demo Button separately is better.
-                setError("No se pudo conectar a Supabase. Asegúrate de configurar las claves en .env");
+                setError("No se pudo conectar a Supabase. Asegúrate de configurar las claves en .env o usa el modo Demo.");
             } else {
-                setError(err.message || 'Error al iniciar sesión');
+                setError(error.message || 'Error al iniciar sesión');
             }
         } finally {
             setLoading(false);
@@ -42,9 +43,7 @@ export const Login = () => {
 
     // Helper for demo mode (since user might not have DB yet)
     const handleDemoLogin = () => {
-        // This is a "fake" login that just redirects to dashboard. 
-        // Note: Real AuthContext won't see this as logged in unless we mock it there too.
-        // For now, allow bypass to see the app.
+        enterDemoMode();
         navigate('/');
     };
 

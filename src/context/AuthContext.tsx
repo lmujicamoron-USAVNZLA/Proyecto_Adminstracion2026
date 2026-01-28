@@ -7,6 +7,7 @@ interface AuthContextType {
     user: User | null;
     signOut: () => Promise<void>;
     loading: boolean;
+    enterDemoMode: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -14,6 +15,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     signOut: async () => { },
     loading: true,
+    enterDemoMode: () => { },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -22,11 +24,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Safe timeout to prevent infinite loading if Supabase hangs
+        const timeout = setTimeout(() => {
+            setLoading(false);
+            console.warn("Auth check timed out - keeping loading=false to allow interaction");
+        }, 3000);
+
         // Check for active session
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
+            if (session) {
+                setSession(session);
+                setUser(session.user);
+            }
             setLoading(false);
+            clearTimeout(timeout);
+        }).catch((err) => {
+            console.error("Auth initialization error:", err);
+            setLoading(false);
+            clearTimeout(timeout);
         });
 
         // Listen for auth changes
@@ -36,18 +51,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(timeout);
+        };
     }, []);
 
     const signOut = async () => {
         await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+    };
+
+    const enterDemoMode = () => {
+        const dummyUser: any = {
+            id: 'demo-user',
+            email: 'demo@nexus.com',
+            user_metadata: { full_name: 'Usuario Demo' }
+        };
+        const dummySession: any = {
+            access_token: 'demo-token',
+            user: dummyUser
+        };
+        setSession(dummySession);
+        setUser(dummyUser);
+        setLoading(false);
     };
 
     return (
-        <AuthContext.Provider value={{ session, user, signOut, loading }}>
+        <AuthContext.Provider value={{ session, user, signOut, loading, enterDemoMode }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

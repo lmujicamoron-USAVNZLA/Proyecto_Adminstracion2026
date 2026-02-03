@@ -84,7 +84,7 @@ export const AppLayout = () => {
                 <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[100px] pointer-events-none" />
 
                 {/* Header */}
-                <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 backdrop-blur-sm relative z-30">
+                <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
                     <h2 className="text-lg font-medium text-muted-foreground">Bienvenido, <span className="text-foreground">{fullName}</span></h2>
                     <div className="flex items-center gap-4">
                         <NotificationCenter />

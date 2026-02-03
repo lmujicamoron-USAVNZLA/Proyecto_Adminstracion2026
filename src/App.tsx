@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { Login } from './pages/Auth/Login';
@@ -16,7 +16,7 @@ import { RequireAuth } from './components/auth/RequireAuth';
 
 function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <ErrorBoundary>
         <AuthProvider>
           <NotificationProvider>
@@ -34,7 +34,7 @@ function App() {
           </NotificationProvider>
         </AuthProvider>
       </ErrorBoundary>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

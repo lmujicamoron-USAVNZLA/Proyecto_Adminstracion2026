@@ -64,15 +64,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const enterDemoMode = () => {
-        const dummyUser: any = {
+        const dummyUser = {
             id: 'demo-user',
             email: 'demo@nexus.com',
             user_metadata: { full_name: 'Usuario Demo' }
-        };
-        const dummySession: any = {
+        } as unknown as User;
+
+        const dummySession = {
             access_token: 'demo-token',
-            user: dummyUser
-        };
+            user: dummyUser,
+            refresh_token: 'demo-refresh',
+            expires_in: 3600,
+            token_type: 'bearer'
+        } as unknown as Session;
+
         setSession(dummySession);
         setUser(dummyUser);
         setLoading(false);

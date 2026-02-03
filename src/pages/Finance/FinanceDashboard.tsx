@@ -227,7 +227,7 @@ export const FinanceDashboard = () => {
                             {transactions.length > 0 ? (
                                 transactions.slice(0, 5).map((t) => (
                                     <tr key={t.id} className="hover:bg-white/[0.02] transition-colors">
-                                        <td className="px-6 py-4 font-medium">{(t as any).property?.title || 'Propiedad'}</td>
+                                        <td className="px-6 py-4 font-medium">{t.property?.title || 'Propiedad'}</td>
                                         <td className="px-6 py-4 text-muted-foreground text-sm">{t.signature_date}</td>
                                         <td className="px-6 py-4 font-bold">${t.final_price?.toLocaleString()}</td>
                                         <td className="px-6 py-4 text-green-400 font-bold">${t.commission_amount?.toLocaleString()}</td>

@@ -43,3 +43,20 @@ export type Expense = {
     linked_property_id?: string;
     created_at: string;
 };
+export type Notification = {
+    id: string;
+    title: string;
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+    timestamp: string;
+    read: boolean;
+};
+
+export type PropertyActivity = {
+    id: string;
+    property_id: string;
+    performed_by?: string;
+    type: string;
+    notes: string;
+    created_at: string;
+};

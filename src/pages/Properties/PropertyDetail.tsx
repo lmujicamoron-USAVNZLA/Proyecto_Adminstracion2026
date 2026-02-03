@@ -5,7 +5,7 @@ import {
     ArrowLeft, MapPin, Calendar, User,
     FileText, CheckCircle2, Clock, Briefcase, Calculator
 } from 'lucide-react';
-import type { Property, Transaction } from '../../types';
+import type { Property, Transaction, PropertyActivity, PropertyStatus } from '../../types';
 import { useNotifications } from '../../context/NotificationContext';
 
 // Mock Data (fallback)
@@ -74,44 +74,43 @@ export const PropertyDetail = () => {
     const { id } = useParams();
     const [property, setProperty] = useState<Property | null>(null);
     const [transaction, setTransaction] = useState<Transaction | null>(null);
-    const [activities, setActivities] = useState<any[]>([]);
+    const [activities, setActivities] = useState<PropertyActivity[]>([]);
     const [loading, setLoading] = useState(true);
     const [newActivity, setNewActivity] = useState({ type: 'visita', notes: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (id) {
-            fetchData();
-        }
-    }, [id]);
-
-    async function fetchData() {
-        try {
-            setLoading(true);
-            const [propRes, transRes, actRes] = await Promise.all([
-                supabase.from('properties').select('*, agent:profiles(*)').eq('id', id).single(),
-                supabase.from('transactions').select('*').eq('property_id', id).maybeSingle(),
-                supabase.from('property_activity').select('*').eq('property_id', id).order('created_at', { ascending: false })
-            ]);
-
-            if (propRes.error) throw propRes.error;
-            setProperty(propRes.data);
-            setTransaction(transRes.data);
-            setActivities(actRes.data || []);
-        } catch (error) {
-            console.error('Error fetching property details:', error);
-            if (id === '1') {
-                setProperty(MOCK_PROPERTY);
-                setTransaction(MOCK_TRANSACTION);
-                setActivities([
-                    { id: '1', type: 'captacion', notes: 'Propiedad registrada en el sistema.', created_at: '2023-10-15T12:00:00Z' },
-                    { id: '2', type: 'visita', notes: 'Visita con Ana García, interesada.', created_at: '2024-02-05T10:00:00Z' }
+        async function fetchData() {
+            if (!id) return;
+            try {
+                setLoading(true);
+                const [propRes, transRes, actRes] = await Promise.all([
+                    supabase.from('properties').select('*, agent:profiles(*)').eq('id', id).single(),
+                    supabase.from('transactions').select('*').eq('property_id', id).maybeSingle(),
+                    supabase.from('property_activity').select('*').eq('property_id', id).order('created_at', { ascending: false })
                 ]);
+
+                if (propRes.error) throw propRes.error;
+                setProperty(propRes.data);
+                setTransaction(transRes.data);
+                setActivities(actRes.data || []);
+            } catch (error) {
+                console.error('Error fetching property details:', error);
+                if (id === '1') {
+                    setProperty(MOCK_PROPERTY);
+                    setTransaction(MOCK_TRANSACTION);
+                    setActivities([
+                        { id: '1', property_id: '1', type: 'captacion', notes: 'Propiedad registrada en el sistema.', created_at: '2023-10-15T12:00:00Z' },
+                        { id: '2', property_id: '1', type: 'visita', notes: 'Visita con Ana García, interesada.', created_at: '2024-02-05T10:00:00Z' }
+                    ] as PropertyActivity[]);
+                }
+            } finally {
+                setLoading(false);
             }
-        } finally {
-            setLoading(false);
         }
-    }
+
+        fetchData();
+    }, [id]);
 
     const handleAddActivity = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -138,8 +137,9 @@ export const PropertyDetail = () => {
         } catch (error) {
             console.error('Error adding activity:', error);
             // Demo fallback
-            const demoAct = {
+            const demoAct: PropertyActivity = {
                 id: Math.random().toString(),
+                property_id: id || '',
                 type: newActivity.type,
                 notes: newActivity.notes,
                 created_at: new Date().toISOString()
@@ -183,7 +183,7 @@ export const PropertyDetail = () => {
                     </button>
                     <button
                         onClick={async () => {
-                            const statuses: any[] = ['captado', 'visitado', 'en_tramite', 'vendido', 'financiado'];
+                            const statuses: PropertyStatus[] = ['captado', 'visitado', 'en_tramite', 'vendido', 'financiado'];
                             const currentIndex = statuses.indexOf(displayProperty.status);
                             const nextStatus = statuses[(currentIndex + 1) % statuses.length];
 
@@ -201,7 +201,8 @@ export const PropertyDetail = () => {
                                     message: `La propiedad ahora está en estado: ${nextStatus.toUpperCase()}`,
                                     type: 'info'
                                 });
-                            } catch (e) {
+                            } catch (err) {
+                                console.error('Error updating status:', err);
                                 // Fallback local
                                 setProperty(prev => prev ? { ...prev, status: nextStatus } : null);
                                 addNotification({

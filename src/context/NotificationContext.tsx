@@ -1,13 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-export interface Notification {
-    id: string;
-    title: string;
-    message: string;
-    type: 'info' | 'success' | 'warning' | 'error';
-    timestamp: string;
-    read: boolean;
-}
+import React, { createContext, useContext, useState } from 'react';
+import type { Notification } from '../types';
 
 interface NotificationContextType {
     notifications: Notification[];
@@ -20,7 +12,16 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([
+        {
+            id: 'welcome',
+            title: 'Bienvenido al Sistema',
+            message: 'Nexus CRM está listo para gestionar tus activos inmobiliarios.',
+            type: 'success',
+            timestamp: new Date().toISOString(),
+            read: false,
+        }
+    ]);
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -42,15 +43,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
         setNotifications([]);
     };
 
-    // Mock initial notification
-    useEffect(() => {
-        addNotification({
-            title: 'Bienvenido al Sistema',
-            message: 'Nexus CRM está listo para gestionar tus activos inmobiliarios.',
-            type: 'success'
-        });
-    }, []);
-
     return (
         <NotificationContext.Provider value={{ notifications, unreadCount, addNotification, markAsRead, clearAll }}>
             {children}
@@ -58,6 +50,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useNotifications = () => {
     const context = useContext(NotificationContext);
     if (!context) throw new Error('useNotifications must be used within a NotificationProvider');

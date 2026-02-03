@@ -138,7 +138,7 @@ export const AgentList = () => {
                                 <label className="text-xs text-muted-foreground ml-1">Rol de Usuario</label>
                                 <select
                                     value={newAgent.role}
-                                    onChange={e => setNewAgent({ ...newAgent, role: e.target.value as any })}
+                                    onChange={e => setNewAgent({ ...newAgent, role: e.target.value as Profile['role'] })}
                                     className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
                                 >
                                     <option value="agent">Agente</option>

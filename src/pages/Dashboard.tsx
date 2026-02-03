@@ -29,6 +29,15 @@ const StatCard = ({ title, value, change, icon: Icon, color }: { title: string, 
     </motion.div>
 );
 
+import type { PropertyActivity } from '../types';
+
+interface DashboardActivity extends PropertyActivity {
+    profiles?: { full_name: string };
+    properties?: { title: string };
+}
+
+import { DashboardSkeleton } from '../components/Skeleton';
+
 export const Dashboard = () => {
     const [stats, setStats] = useState({
         totalSales: 0,
@@ -36,7 +45,7 @@ export const Dashboard = () => {
         netProfit: 0,
         activeAgents: 0,
     });
-    const [activities, setActivities] = useState<any[]>([]);
+    const [activities, setActivities] = useState<DashboardActivity[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -67,7 +76,8 @@ export const Dashboard = () => {
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
         } finally {
-            setLoading(false);
+            // Artificial delay for better UX demo
+            setTimeout(() => setLoading(false), 500);
         }
     }
 
@@ -81,6 +91,8 @@ export const Dashboard = () => {
         { name: 'Jul', sales: 3490 },
     ];
 
+    if (loading) return <DashboardSkeleton />;
+
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-end">
@@ -88,9 +100,6 @@ export const Dashboard = () => {
                     <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
                     <p className="text-muted-foreground mt-2">Resumen general de la actividad inmobiliaria.</p>
                 </div>
-                {loading && <div className="animate-pulse flex items-center gap-2 text-primary text-sm font-bold bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">
-                    <Activity size={16} /> ACTUALIZANDO...
-                </div>}
             </div>
 
             {/* KPIs */}

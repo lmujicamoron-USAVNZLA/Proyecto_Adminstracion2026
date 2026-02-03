@@ -40,6 +40,8 @@ jobs:
         uses: actions/configure-pages@v4
         with:
           enablement: true
+      - name: Create 404 Page
+        run: cp dist/index.html dist/404.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

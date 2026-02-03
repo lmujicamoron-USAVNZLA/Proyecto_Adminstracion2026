@@ -12,6 +12,8 @@ import { FinanceDashboard } from './pages/Finance/FinanceDashboard';
 import { NotificationProvider } from './context/NotificationContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
+import { RequireAuth } from './components/auth/RequireAuth';
+
 function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -20,7 +22,7 @@ function App() {
           <NotificationProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route element={<AppLayout />}>
+              <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/properties" element={<PropertyList />} />
                 <Route path="/properties/:id" element={<PropertyDetail />} />
